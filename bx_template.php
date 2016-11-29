@@ -320,19 +320,32 @@
 		 * @return String               Идетификатор области.
 		 */
 		function bt_actions($arItem, $component) {
-			$delete = $arItem['DELETE_LINK'];
-			$edit = $arItem['EDIT_LINK'];
+			$block = _bt_get_full($arItem, 'IBLOCK_ID');
+			$id = _bt_get_full($arItem, 'ID');
 
-			$block = $arItem["IBLOCK_ID"];
-			$id = $arItem['ID'];
+			$noData = empty($block) || empty($id);
+			if ($noData) return null;
 
-			$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
-			$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
+			$delete = _bt_get_full($arItem, 'DELETE_LINK');
+			$edit = _bt_get_full($arItem, 'EDIT_LINK');
 
-			$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
+			$noLinks = empty($edit) && empty($delete);
+			
+			if ($noLinks) {
+				/** @todo Получение ссылок вручную. */
+				return null;
+			}
 
-			$component->AddEditAction($id, $edit, $editOpts);
-			$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
+			if ($edit) {
+				$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
+				$component->AddEditAction($id, $edit, $editOpts);
+			}
+
+			if ($delete) {
+				$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
+				$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
+				$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
+			}
 
 			return $component->GetEditAreaId($id);
 		}
