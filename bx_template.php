@@ -271,18 +271,6 @@
 		}
 
 		/**
-		 * Получает значение свойства элемента по селектору.
-		 * @param  Array  $arItem Элемент инфоблока.
-		 * @param  String $select Селектор.
-		 * @param  Mixed  $def    Значение по умолчанию.
-		 * @return Mixed          Значение.
-		 */
-		function bt_value($arItem, $select, $def = null) {
-			$value = bt_func($arItem, $select, '_bt_fn_value');
-			return empty($value) ? $def : $value;
-		}
-
-		/**
 		 * Получает значение по селектору, преобразовывая его с помощью функции $fn.
 		 * @param  Array    $arItem Массив, в котором производится поиск.
 		 * @param  String   $select Селектор.
@@ -299,6 +287,18 @@
 			$args = array_slice($args, 3);
 
 			return _bt_get($arItem, $select, $fn, $args);
+		}
+
+		/**
+		 * Получает значение свойства элемента по селектору.
+		 * @param  Array  $arItem Элемент инфоблока.
+		 * @param  String $select Селектор.
+		 * @param  Mixed  $def    Значение по умолчанию.
+		 * @return Mixed          Значение.
+		 */
+		function bt_value($arItem, $select, $def = null) {
+			$value = bt_func($arItem, $select, '_bt_fn_value');
+			return empty($value) ? $def : $value;
 		}
 
 		/**
