@@ -140,7 +140,16 @@
 	/// ------------------------------
 	/// Функции преобразования данных.
 	/// ------------------------------
-		
+			
+		/**
+		 * Получает значение по ключу 'VALUE'.
+		 * @param  Mixed $value Свойство.
+		 * @return Mixed        Значение.
+		 */
+		function _bt_fn_value($value) {
+			return empty($value['VALUE']) ? $value['VALUE'] : null;
+		}
+
 		/**
 		 * Получает ссылку на файл.
 		 * @param  Array  $value Описание файла или его ID.
@@ -269,8 +278,8 @@
 		 * @return Mixed          Значение.
 		 */
 		function bt_value($arItem, $select, $def = null) {
-			$value = _bt_get($arItem, $select);
-			return isset($value['VALUE']) ? $value['VALUE'] : $def;
+			$value = bt_func($arItem, $select, '_bt_fn_value');
+			return empty($value) ? $def : $value;
 		}
 
 		/**
