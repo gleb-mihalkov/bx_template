@@ -214,6 +214,21 @@
 			return empty($file) ? null : $file;
 		}
 
+		/**
+		 * Возвращает дату в указанном формате.
+		 * @param  Mixed  $value Свойство или значение даты.
+		 * @return String        Дата в указанном формате.
+		 */
+		function _bt_fn_date($value, $format) {
+			if (empty($value)) return null;
+
+			$value = empty($value['VALUE']) ? $value['VALUE'] : $value;
+			if (!is_string($value)) return null;
+
+			$value = empty($format) ? $value : ConvertDateTime($value, $format);
+			return empty($value) ? null : $value;
+		}
+
 	/// -------------------------------------------
 	/// Методы получения преобразованного значения.
 	/// -------------------------------------------
@@ -324,5 +339,18 @@
 		 */
 		function bt_image($arItem, $select, $width = null, $height = null, $def = null) {
 			$value = bt_func($arItem, $select, '_bt_fn_image', $width, $height);
+			return empty($value) ? $def : $value;
+		}
+
+		/**
+		 * Возвращает дату из свойства элемента.
+		 * @param  Array $arItem Элемент инфоблока.
+		 * @param  String $select Селектор.
+		 * @param  String $format Выходной формат даты.
+		 * @param  String $def    Значение по умолчанию.
+		 * @return String         Дата.
+		 */
+		function bt_date($arItem, $select, $format = null, $def = null) {
+			$value = bt_func($arItem, $select, $format);
 			return empty($value) ? $def : $value;
 		}
