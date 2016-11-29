@@ -319,7 +319,7 @@
 		 * @param  Component $component Компонент Bitrix (в шаблоне - переменная $this).
 		 * @return String               Идетификатор области.
 		 */
-		function bt_actions($arItem, $component) {
+		function bt_action($arItem, $component) {
 			$block = _bt_get_full($arItem, 'IBLOCK_ID');
 			$id = _bt_get_full($arItem, 'ID');
 
