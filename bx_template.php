@@ -1,5 +1,24 @@
 <?php
 
+	/// ----------
+	/// Константы.
+	/// ----------
+	
+		// Дата вида '31.01.2016'.
+		define('BT_DATE', 'd.m.Y');
+
+		// Дата вида '31 Января 2016'.
+		define('BT_DATE_RU', 'j F Y');
+
+		// Время вида '14:30'.
+		define('BT_TIME', 'H:i');
+
+		// Дата вида '31.01.2016 14:30'.
+		define('BT_DATETIME', 'd.m.Y H:i');
+
+		// Дата вида '31 Января 2016 года, 14:30'.
+		define('BT_DATETIME_RU', 'j F Y года, H:i');
+
 	/// ------------------------------------------------------
 	/// Методы работы с источниками данных компонентов Bitrix.
 	/// ------------------------------------------------------
@@ -147,7 +166,7 @@
 		 * @return Mixed        Значение.
 		 */
 		function _bt_fn_value($value) {
-			return empty($value['VALUE']) ? $value['VALUE'] : null;
+			return empty($value['VALUE']) ? $value : $value['VALUE'];
 		}
 
 		/**
@@ -222,11 +241,34 @@
 		function _bt_fn_date($value, $format) {
 			if (empty($value)) return null;
 
-			$value = empty($value['VALUE']) ? $value['VALUE'] : $value;
+			$value = empty($value['VALUE']) ? $value : $value['VALUE'];
 			if (!is_string($value)) return null;
 
-			$value = empty($format) ? $value : ConvertDateTime($value, $format);
+			$isConvert = !empty($format);
+
+			if ($isConvert) {
+				$time = MakeTimeStamp($value);
+				if (!isset($time)) return null;
+
+				$value = FormatDate($format, $time);
+			}
+
 			return empty($value) ? null : $value;
+		}
+
+		/**
+		 * Преобразовывает HTML-код в соответствующий текст.
+		 * @param  String $value HTML-код.
+		 * @return String        Текст.
+		 */
+		function _bt_fn_text($value) {
+			return HTMLToTxt($value, '', array(), false);
+			// $isPlain = !empty($value) && empty($result);
+			// return $isPlain ? $value : $result;
+		}
+
+		function _bt_fn_html($value) {
+			return TxtToHTML($value);
 		}
 
 	/// -------------------------------------------
@@ -351,6 +393,30 @@
 		 * @return String         Дата.
 		 */
 		function bt_date($arItem, $select, $format = null, $def = null) {
-			$value = bt_func($arItem, $select, $format);
+			$value = bt_func($arItem, $select, '_bt_fn_date', $format);
 			return empty($value) ? $def : $value;
+		}
+
+		/**
+		 * Преобразует HTML-код в соответствующий текст.
+		 * @param  Array  $arItem Элемент инфоблока.
+		 * @param  String $select Селектор.
+		 * @param  String $def    Значение по умолчанию.
+		 * @return String         Текст.
+		 */
+		function bt_text($arItem, $select, $def = null) {
+			$value = bt_func($arItem, $select, '_bt_fn_text');
+			return isset($def) && !isset($value) ? $def : $value;
+		}
+
+		/**
+		 * Преобразует текст в соответствующий HTML-код.
+		 * @param  Array $arItem Элемент инфоблока.
+		 * @param  String $select Селектор.
+		 * @param  String $def    Значение по умолчанию.
+		 * @return String         HTML-код.
+		 */
+		function bt_html($arItem, $select, $def = null) {
+			$value = bt_func($arItem, $select, '_bt_fn_html');
+			return isset($def) && !isset($value) ? $def : $value;
 		}
