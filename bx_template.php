@@ -156,6 +156,100 @@
 			return null;
 		}
 
+	/// ---------------------------
+	/// Функции получения значения.
+	/// ---------------------------
+	
+		/**
+		 * Получает значение по селектору. Если значение не найдено, возвращается значение
+		 * по умолчанию.
+		 * @param  Array  $arItem Массив, в котором производится поиск.
+		 * @param  String $select Селектор.
+		 * @param  String $def    Значение по умолчанию.
+		 * @return Mixed          Значение.
+		 */
+		function bt_get($arItem, $select, $def = null) {
+			$value = _bt_get($arItem, $select);
+			return isset($value) ? $value : $def;
+		}
+
+		/**
+		 * Получает непустое значение по селектору.
+		 * @param  Array  $arItem Массив, в котором производится поиск.
+		 * @param  String $select Селектор.
+		 * @param  Mixed  $def    Значение по умолчанию.
+		 * @return Mixed          Значение.
+		 */
+		function bt_full($arItem, $select, $def = null) {
+			$value = _bt_get($arItem, $select);
+			return empty($value) ? $def : $value;
+		}
+
+		/**
+		 * Возвращает ID элемента.
+		 * @param  Array  $arItem Элемент.
+		 * @return String         ID.
+		 */
+		function bt_id($arItem) {
+			return _bt_get_full($arItem, 'ID');
+		}
+
+		/**
+		 * Возвращает название элемента.
+		 * @param  Array  $arItem Элемент.
+		 * @return String         Название.
+		 */
+		function bt_name($arItem) {
+			return _bt_get_full($arItem, 'NAME');
+		}
+
+		/**
+		 * Возвращает символьный код элемента.
+		 * @param  Array  $arItem Элемент.
+		 * @return String         Символьный код.
+		 */
+		function bt_code($arItem) {
+			return _bt_get_full($arItem, 'CODE');
+		}
+
+		/**
+		 * Возвращает ID области редактирования элемента инфоблока из 
+		 * публичной части сайта.
+		 * @param  Array     $arItem    Элемент инфоблока.
+		 * @param  Component $component Компонент Bitrix (в шаблоне - переменная $this).
+		 * @return String               Идетификатор области.
+		 */
+		function bt_action($arItem, $component) {
+			$block = _bt_get_full($arItem, 'IBLOCK_ID');
+			$id = _bt_get_full($arItem, 'ID');
+
+			$noData = empty($block) || empty($id);
+			if ($noData) return null;
+
+			$delete = _bt_get_full($arItem, 'DELETE_LINK');
+			$edit = _bt_get_full($arItem, 'EDIT_LINK');
+
+			$noLinks = empty($edit) && empty($delete);
+			
+			if ($noLinks) {
+				/** @todo Получение ссылок вручную. */
+				return null;
+			}
+
+			if ($edit) {
+				$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
+				$component->AddEditAction($id, $edit, $editOpts);
+			}
+
+			if ($delete) {
+				$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
+				$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
+				$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
+			}
+
+			return $component->GetEditAreaId($id);
+		}
+
 	/// ------------------------------
 	/// Функции преобразования данных.
 	/// ------------------------------
@@ -259,96 +353,6 @@
 	/// -------------------------------------------
 	/// Методы получения преобразованного значения.
 	/// -------------------------------------------
-
-		/**
-		 * Получает значение по селектору. Если значение не найдено, возвращается значение
-		 * по умолчанию.
-		 * @param  Array  $arItem Массив, в котором производится поиск.
-		 * @param  String $select Селектор.
-		 * @param  String $def    Значение по умолчанию.
-		 * @return Mixed          Значение.
-		 */
-		function bt_get($arItem, $select, $def = null) {
-			$value = _bt_get($arItem, $select);
-			return isset($value) ? $value : $def;
-		}
-
-		/**
-		 * Получает непустое значение по селектору.
-		 * @param  Array  $arItem Массив, в котором производится поиск.
-		 * @param  String $select Селектор.
-		 * @param  Mixed  $def    Значение по умолчанию.
-		 * @return Mixed          Значение.
-		 */
-		function bt_full($arItem, $select, $def = null) {
-			$value = _bt_get($arItem, $select);
-			return empty($value) ? $def : $value;
-		}
-
-		/**
-		 * Возвращает ID элемента.
-		 * @param  Array  $arItem Элемент.
-		 * @return String         ID.
-		 */
-		function bt_id($arItem) {
-			return _bt_get_full($arItem, 'ID');
-		}
-
-		/**
-		 * Возвращает название элемента.
-		 * @param  Array  $arItem Элемент.
-		 * @return String         Название.
-		 */
-		function bt_name($arItem) {
-			return _bt_get_full($arItem, 'NAME');
-		}
-
-		/**
-		 * Возвращает символьный код элемента.
-		 * @param  Array  $arItem Элемент.
-		 * @return String         Символьный код.
-		 */
-		function bt_code($arItem) {
-			return _bt_get_full($arItem, 'CODE');
-		}
-
-		/**
-		 * Возвращает ID области редактирования элемента инфоблока из 
-		 * публичной части сайта.
-		 * @param  Array     $arItem    Элемент инфоблока.
-		 * @param  Component $component Компонент Bitrix (в шаблоне - переменная $this).
-		 * @return String               Идетификатор области.
-		 */
-		function bt_action($arItem, $component) {
-			$block = _bt_get_full($arItem, 'IBLOCK_ID');
-			$id = _bt_get_full($arItem, 'ID');
-
-			$noData = empty($block) || empty($id);
-			if ($noData) return null;
-
-			$delete = _bt_get_full($arItem, 'DELETE_LINK');
-			$edit = _bt_get_full($arItem, 'EDIT_LINK');
-
-			$noLinks = empty($edit) && empty($delete);
-			
-			if ($noLinks) {
-				/** @todo Получение ссылок вручную. */
-				return null;
-			}
-
-			if ($edit) {
-				$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
-				$component->AddEditAction($id, $edit, $editOpts);
-			}
-
-			if ($delete) {
-				$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
-				$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
-				$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
-			}
-
-			return $component->GetEditAreaId($id);
-		}
 
 		/**
 		 * Получает значение по селектору, преобразовывая его с помощью функции $fn.
