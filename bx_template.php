@@ -256,21 +256,6 @@
 			return empty($value) ? null : $value;
 		}
 
-		/**
-		 * Преобразовывает HTML-код в соответствующий текст.
-		 * @param  String $value HTML-код.
-		 * @return String        Текст.
-		 */
-		function _bt_fn_text($value) {
-			return HTMLToTxt($value, '', array(), false);
-			// $isPlain = !empty($value) && empty($result);
-			// return $isPlain ? $value : $result;
-		}
-
-		function _bt_fn_html($value) {
-			return TxtToHTML($value);
-		}
-
 	/// -------------------------------------------
 	/// Методы получения преобразованного значения.
 	/// -------------------------------------------
@@ -395,28 +380,4 @@
 		function bt_date($arItem, $select, $format = null, $def = null) {
 			$value = bt_func($arItem, $select, '_bt_fn_date', $format);
 			return empty($value) ? $def : $value;
-		}
-
-		/**
-		 * Преобразует HTML-код в соответствующий текст.
-		 * @param  Array  $arItem Элемент инфоблока.
-		 * @param  String $select Селектор.
-		 * @param  String $def    Значение по умолчанию.
-		 * @return String         Текст.
-		 */
-		function bt_text($arItem, $select, $def = null) {
-			$value = bt_func($arItem, $select, '_bt_fn_text');
-			return isset($def) && !isset($value) ? $def : $value;
-		}
-
-		/**
-		 * Преобразует текст в соответствующий HTML-код.
-		 * @param  Array $arItem Элемент инфоблока.
-		 * @param  String $select Селектор.
-		 * @param  String $def    Значение по умолчанию.
-		 * @return String         HTML-код.
-		 */
-		function bt_html($arItem, $select, $def = null) {
-			$value = bt_func($arItem, $select, '_bt_fn_html');
-			return isset($def) && !isset($value) ? $def : $value;
 		}
