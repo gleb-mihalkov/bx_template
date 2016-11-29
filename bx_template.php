@@ -313,6 +313,31 @@
 		}
 
 		/**
+		 * Возвращает ID области редактирования элемента инфоблока из 
+		 * публичной части сайта.
+		 * @param  Array     $arItem    Элемент инфоблока.
+		 * @param  Component $component Компонент Bitrix (в шаблоне - переменная $this).
+		 * @return String               Идетификатор области.
+		 */
+		function bt_actions($arItem, $component) {
+			$delete = $arItem['DELETE_LINK'];
+			$edit = $arItem['EDIT_LINK'];
+
+			$block = $arItem["IBLOCK_ID"];
+			$id = $arItem['ID'];
+
+			$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
+			$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
+
+			$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
+
+			$component->AddEditAction($id, $edit, $editOpts);
+			$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
+
+			return $component->GetEditAreaId($id);
+		}
+
+		/**
 		 * Получает значение по селектору, преобразовывая его с помощью функции $fn.
 		 * @param  Array    $arItem Массив, в котором производится поиск.
 		 * @param  String   $select Селектор.
