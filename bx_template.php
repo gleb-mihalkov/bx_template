@@ -57,6 +57,36 @@
 		}
 
 		/**
+		 * Вызывает пользовательскую функцию преобразования значения.
+		 * @param  Array    $array Массив, в котором находится значение.
+		 * @param  String   $key   Ключ, по которому находится значение.
+		 * @param  Mixed    $value Значение.
+		 * @param  Callable $fn    Функция преобразования значения.
+		 * @param  Array    $args  Дополнительные аргументы для функции.
+		 * @return Mixed           Результат выполнения функции.
+		 */
+		function _bt_call($array, $key, $value, $fn, $args) {
+			$argsLength = count($args);
+
+			for ($i = 0; $i < $argsLength; $i++) {
+				$keyword = $args[$i];
+
+				if ($keyword === '__KEY__') {
+					$args[$i] = $key;
+					continue;
+				}
+
+				if ($keyword === '__ARRAY__') {
+					$args[$i] = $array;
+					continue;
+				}
+			}
+
+			array_unshift($args, $value);
+			return call_user_func_array($fn, $args);
+		}
+
+		/**
 		 * Получает значение по ключу в ассоциативном массиве или null, если значение не найдено.
 		 * @param  Array    $array  Массив.
 		 * @param  String   $key    Ключ.
@@ -67,13 +97,7 @@
 		function _bt_get_value($array, $key, $fn = null, $args = array()) {
 			$value = _bt_get_safe($array, $key);
 			$isTransform = isset($value) && isset($fn);
-
-			if ($isTransform) {
-				array_unshift($args, $value);
-				return call_user_func_array($fn, $args);
-			}
-
-			return $value;
+			return $isTransform ? _bt_call($array, $key, $value, $fn, $args) : $value;
 		}
 
 		/**
@@ -256,7 +280,7 @@
 			
 		/**
 		 * Получает значение по ключу 'VALUE'.
-		 * @param  Mixed $value Свойство.
+		 * @param  Mixed  $value Свойство.
 		 * @return Mixed        Значение.
 		 */
 		function _bt_fn_value($value) {
@@ -350,6 +374,19 @@
 			return empty($value) ? null : $value;
 		}
 
+		/**
+		 * Преобразует текстовое содержимое инфоблока в нужный формат (текст или HTML).
+		 * @param  Mixed  $value Текстовая строка или массив свойства.
+		 * @param  String $key   Ключ, по которому находится значение.
+		 * @param  Array  $obj   Родительский массив.
+		 * @return String        Содержимое в указанном формате.
+		 */
+		function _bt_fn_text($value, $key, $array, $format) {
+			if (empty($value)) return '';
+			var_dump($key);
+			var_dump($array);
+		}
+
 	/// -------------------------------------------
 	/// Методы получения преобразованного значения.
 	/// -------------------------------------------
@@ -421,5 +458,29 @@
 		 */
 		function bt_date($arItem, $select, $format = null, $def = null) {
 			$value = bt_func($arItem, $select, '_bt_fn_date', $format);
+			return empty($value) ? $def : $value;
+		}
+
+		/**
+		 * Возвращает содержимое элемента в виде отформатированного текста.
+		 * @param  Array  $arItem Элемент инфоблока.
+		 * @param  String $select Селектор.
+		 * @param  String $def    Текст по умолчанию.
+		 * @return String         Текст.
+		 */
+		function bt_text($arItem, $select, $def = null) {
+			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'text');
+			return empty($value) ? $def : $value;
+		}
+
+		/**
+		 * Возвращает содержимое элемента в виде HTML-кода.
+		 * @param  Array  $arItem Элемент инфоблока.
+		 * @param  String $select Селектор.
+		 * @param  String $def    Текст по умолчанию.
+		 * @return String         Текст.
+		 */
+		function bt_html($arItem, $select, $def = null) {
+			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'html');
 			return empty($value) ? $def : $value;
 		}
