@@ -383,8 +383,41 @@
 		 */
 		function _bt_fn_text($value, $key, $array, $format) {
 			if (empty($value)) return '';
-			var_dump($key);
-			var_dump($array);
+
+			$text = $value;
+			$type = 'TEXT';
+			
+			if (is_array($value)) {
+				$isVal = is_array($value['VALUE']);
+
+				if ($isVal) {
+					$value = $value['VALUE'];
+					$type = $value['TYPE'];
+					$text = $value['TEXT'];
+				}
+				else {
+					$text = $value['VALUE'];
+				}
+			}
+			else {
+				$type = $key.'_TYPE';
+				$type = _bt_get_full($array, $type);
+
+				if (empty($type)) {
+					$type = 'TYPE';
+					$type = _bt_get_full($array, $type);
+					$type = empty($type) ? 'TEXT' : $type;
+				}
+			}
+
+			$type = strtolower($type);
+
+			$isNative = $type === $format;
+			if ($isNative) return $text;
+
+			return $format === 'text'
+				? HTMLToTxt($text)
+				: TxtToHTML($text, '', array(), false);
 		}
 
 	/// -------------------------------------------
