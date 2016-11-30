@@ -602,7 +602,7 @@
 		 * @param  Number  $count Указывает, в который раз возвратить trueю
 		 * @return Boolean        True или false.
 		 */
-		function bt_is_count($count = 1) {
+		function bt_is_count($count = 0) {
 			static $now = 0;
 
 			if ($count === 0) {
