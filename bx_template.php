@@ -591,25 +591,4 @@
 			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'HTML');
 			return empty($value) ? $def : $value;
 		}
-
-	/// ---------------
-	/// Прочие функции.
-	/// ---------------
-		
-		/**
-		 * Возвращает true, если функция была вызвана в $count-ый раз, иначе возращает false.
-		 * Вызов bt_is_count() запускает новый отсчет.
-		 * @param  Number  $count Указывает, в который раз возвратить true.
-		 * @return Boolean        True или false.
-		 */
-		function bt_is_count($count = 0) {
-			static $now = 0;
-
-			if ($count === 0) {
-				$now = 0;
-				return null;
-			}
-
-			return ++$now === $count;
-		}
 	
