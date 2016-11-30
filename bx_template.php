@@ -243,6 +243,53 @@
 		}
 
 		/**
+		 * Добавляет кнопку редактирования.
+		 * @param  Array     $arItem    Элемент инфоблока.
+		 * @param  String    $id        ID элемента.
+		 * @param  String    $block     ID инфоблока.
+		 * @param  Component $component Компонент Bitrix.
+		 * @return Boolean              True, если кнопка добавлена, иначе false.
+		 */
+		function _bt_action_edit($arItem, $id, $block, $component) {
+			$edit = _bt_get_full($arItem, 'EDIT_LINK');
+				
+			if (empty($edit)) {
+				/** @todo Получение ссылки вручную. */
+			}
+
+			if (empty($edit)) return false;
+
+			$opts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
+			$component->AddEditAction($id, $edit, $opts);
+
+			return true;
+		}
+
+		/**
+		 * Добавляет кнопку удаления.
+		 * @param  Array     $arItem    Элемент инфоблока.
+		 * @param  String    $id        ID элемента.
+		 * @param  String    $block     ID инфоблока.
+		 * @param  Component $component Компонент Bitrix.
+		 * @return Boolean              True, если кнопка добавлена, иначе false.
+		 */
+		function _bt_action_delete($arItem, $id, $block, $component) {
+			$delete = _bt_get_full($arItem, 'DELETE_LINK');
+				
+			if (empty($delete)) {
+				/** @todo Получение ссылки вручную. */
+			}
+
+			if (empty($delete)) return false;
+
+			$params = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
+			$opts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
+			$component->AddDeleteAction($id, $delete, $opts, $params);
+
+			return true;
+		}
+
+		/**
 		 * Возвращает ID области редактирования элемента инфоблока из 
 		 * публичной части сайта.
 		 * @param  Array     $arItem    Элемент инфоблока.
@@ -255,47 +302,28 @@
 			$block = _bt_get_full($arItem, 'IBLOCK_ID');
 			$id = _bt_get_full($arItem, 'ID');
 
-			$noData = empty($block) || empty($id);
-			if ($noData) return null;
+			$isExit = empty($block) || empty($id);
+			if ($isExit) return null;
 
-			$isDelete = $flagA === BT_DELETE || $flagB === BT_DELETE;
-			$isEdit = $flagA === BT_EDIT || $flagB === BT_EDIT;
-
-			if ($isEdit) {
-				$edit = _bt_get_full($arItem, 'EDIT_LINK');
-				
-				if (empty($edit)) {
-					/** @todo Получение ссылки вручную. */
-				}
-
-				if (!empty($edit)) {
-					$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
-					$component->AddEditAction($id, $edit, $editOpts);
-				}
-				else {
-					$isEdit = false;
-				}
+			if ($flagA === BT_EDIT) {
+				$isEdit = _bt_action_edit($arItem, $id, $block, $component);
 			}
 
-			if ($isDelete) {
-				$delete = _bt_get_full($arItem, 'DELETE_LINK');
-				
-				if (empty($delete)) {
-					/** @todo Получение ссылки вручную. */
-				}
+			if ($flagA === BT_DELETE) {
+				$isDelete = _bt_action_delete($arItem, $id, $block, $component);
+			}
 
-				if (!empty($delete)) {
-					$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
-					$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
-					$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
-				}
-				else {
-					$isDelete = false;
-				}
+			if ($flagA !== BT_EDIT && $flagB === BT_EDIT) {
+				$isEdit = _bt_action_edit($arItem, $id, $block, $component);
+			}
+
+			if ($flagA !== BT_DELETE && $flagB === BT_DELETE) {
+				$isDelete = _bt_action_delete($arItem, $id, $block, $component);
 			}
 
 			$isArea = $isEdit || $isDelete;
 			$area = $isArea ? $component->GetEditAreaId($id) : null;
+
 			return $area;
 		}
 
