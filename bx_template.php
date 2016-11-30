@@ -375,6 +375,48 @@
 		}
 
 		/**
+		 * Получает текст и исходный формат текста из элемента инфоблока.
+		 * @param  String $key   Начальный ключ для поиска текста.
+		 * @param  Array  $array Массив, в котором производится поиск.
+		 * @return Array         Текст.
+		 */
+		function _bt_fn_text_get($array, $key) {
+			$text = null;
+
+			$node = _bt_get_safe($array, '~'.$key);
+			$node = isset($node) ? $node : _bt_get_safe($array, $key);
+
+			if (is_array($node)) {
+				$value = _bt_get_safe($node, '~TEXT');
+				$value = isset($value) ? $value : _bt_get_safe($node, 'TEXT');
+
+				if (!isset($value)) {
+					$value = _bt_get_safe($node, '~VALUE');
+					$value = isset($value) ? $value : _bt_get_safe($node, 'VALUE');
+
+					$text = isset($value)
+						? (is_array($value) ? _bt_get_safe($value, 'TEXT') : $value)
+						: null;
+				}
+				else {
+					$text = $value;
+				}
+			}
+
+			return isset($text) ? $text : $node.'';
+		}
+
+		/**
+		 * Получает тип текста (TEXT | HTML).
+		 * @param  String $text Текст.
+		 * @return String       Тип текста.
+		 */
+		function _bt_fn_text_type($text) {
+			$match = preg_match('/<[^>]+>/', $text);
+			return $match ? 'HTML' : 'TEXT';
+		}
+
+		/**
 		 * Преобразует текстовое содержимое инфоблока в нужный формат (текст или HTML).
 		 * @param  Mixed  $value Текстовая строка или массив свойства.
 		 * @param  String $key   Ключ, по которому находится значение.
@@ -384,40 +426,17 @@
 		function _bt_fn_text($value, $key, $array, $format) {
 			if (empty($value)) return '';
 
-			$text = $value;
-			$type = 'TEXT';
-			
-			if (is_array($value)) {
-				$isVal = is_array($value['VALUE']);
-
-				if ($isVal) {
-					$value = $value['VALUE'];
-					$type = $value['TYPE'];
-					$text = $value['TEXT'];
-				}
-				else {
-					$text = $value['VALUE'];
-				}
-			}
-			else {
-				$type = $key.'_TYPE';
-				$type = _bt_get_full($array, $type);
-
-				if (empty($type)) {
-					$type = 'TYPE';
-					$type = _bt_get_full($array, $type);
-					$type = empty($type) ? 'TEXT' : $type;
-				}
-			}
-
-			$type = strtolower($type);
+			$text = _bt_fn_text_get($array, $key);
+			$type = _bt_fn_text_type($text);
 
 			$isNative = $type === $format;
 			if ($isNative) return $text;
 
-			return $format === 'text'
+			$result = $format === 'text'
 				? HTMLToTxt($text)
 				: TxtToHTML($text, '', array(), false);
+
+			return $result;
 		}
 
 	/// -------------------------------------------
@@ -502,7 +521,7 @@
 		 * @return String         Текст.
 		 */
 		function bt_text($arItem, $select, $def = null) {
-			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'text');
+			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'TEXT');
 			return empty($value) ? $def : $value;
 		}
 
@@ -514,6 +533,6 @@
 		 * @return String         Текст.
 		 */
 		function bt_html($arItem, $select, $def = null) {
-			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'html');
+			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'HTML');
 			return empty($value) ? $def : $value;
 		}
