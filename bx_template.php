@@ -599,7 +599,7 @@
 		/**
 		 * Возвращает true, если функция была вызвана в $count-ый раз, иначе возращает false.
 		 * Вызов bt_is_count() запускает новый отсчет.
-		 * @param  Number  $count Указывает, в который раз возвратить trueю
+		 * @param  Number  $count Указывает, в который раз возвратить true.
 		 * @return Boolean        True или false.
 		 */
 		function bt_is_count($count = 0) {
