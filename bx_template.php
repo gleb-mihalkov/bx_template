@@ -19,6 +19,12 @@
 		// Дата вида '31 Января 2016 года, 14:30'.
 		define('BT_DATETIME_RU', 'j F Y года, H:i');
 
+		// Показывает, что следует отображать кнопку редактирования.
+		define('BT_EDIT', 'EDIT');
+
+		// Показывает, что следует отображать кнопку удаления.
+		define('BT_DELETE', 'DEL');
+
 	/// ------------------------------------------------------
 	/// Методы работы с источниками данных компонентов Bitrix.
 	/// ------------------------------------------------------
@@ -241,37 +247,56 @@
 		 * публичной части сайта.
 		 * @param  Array     $arItem    Элемент инфоблока.
 		 * @param  Component $component Компонент Bitrix (в шаблоне - переменная $this).
+		 * @param  String    $flagA     Первый флаг кнопки.
+		 * @param  String    $flagB     Второй флаг кнопки.
 		 * @return String               Идетификатор области.
 		 */
-		function bt_action($arItem, $component) {
+		function bt_action($arItem, $component, $flagA = BT_EDIT, $flagB = null) {
 			$block = _bt_get_full($arItem, 'IBLOCK_ID');
 			$id = _bt_get_full($arItem, 'ID');
 
 			$noData = empty($block) || empty($id);
 			if ($noData) return null;
 
-			$delete = _bt_get_full($arItem, 'DELETE_LINK');
-			$edit = _bt_get_full($arItem, 'EDIT_LINK');
+			$isDelete = $flagA === BT_DELETE || $flagB === BT_DELETE;
+			$isEdit = $flagA === BT_EDIT || $flagB === BT_EDIT;
 
-			$noLinks = empty($edit) && empty($delete);
-			
-			if ($noLinks) {
-				/** @todo Получение ссылок вручную. */
-				return null;
+			if ($isEdit) {
+				$edit = _bt_get_full($arItem, 'EDIT_LINK');
+				
+				if (empty($edit)) {
+					/** @todo Получение ссылки вручную. */
+				}
+
+				if (!empty($edit)) {
+					$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
+					$component->AddEditAction($id, $edit, $editOpts);
+				}
+				else {
+					$isEdit = false;
+				}
 			}
 
-			if ($edit) {
-				$editOpts = CIBlock::GetArrayByID($block, "ELEMENT_EDIT");
-				$component->AddEditAction($id, $edit, $editOpts);
+			if ($isDelete) {
+				$delete = _bt_get_full($arItem, 'DELETE_LINK');
+				
+				if (empty($delete)) {
+					/** @todo Получение ссылки вручную. */
+				}
+
+				if (!empty($delete)) {
+					$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
+					$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
+					$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
+				}
+				else {
+					$isDelete = false;
+				}
 			}
 
-			if ($delete) {
-				$deleteParams = array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM'));
-				$deleteOpts = CIBlock::GetArrayByID($block, "ELEMENT_DELETE");
-				$component->AddDeleteAction($id, $delete, $deleteOpts, $deleteParams);
-			}
-
-			return $component->GetEditAreaId($id);
+			$isArea = $isEdit || $isDelete;
+			$area = $isArea ? $component->GetEditAreaId($id) : null;
+			return $area;
 		}
 
 	/// ------------------------------
