@@ -417,6 +417,24 @@
 		}
 
 		/**
+		 * Преобразует текст в HTML.
+		 * @param  String $text Текст.
+		 * @return String       HTML.
+		 */
+		function _bt_fn_text_to_html($text) {
+			return TxtToHTML($text, '', array(), false);
+		}
+
+		/**
+		 * Преобразует HTML в чистый текст.
+		 * @param  String $html HTML код.
+		 * @return String       Текст.
+		 */
+		function _bt_fn_text_to_text($html) {
+			return HTMLToTxt($html);
+		}
+
+		/**
 		 * Преобразует текстовое содержимое инфоблока в нужный формат (текст или HTML).
 		 * @param  Mixed  $value Текстовая строка или массив свойства.
 		 * @param  String $key   Ключ, по которому находится значение.
@@ -432,9 +450,9 @@
 			$isNative = $type === $format;
 			if ($isNative) return $text;
 
-			$result = $format === 'text'
-				? HTMLToTxt($text)
-				: TxtToHTML($text, '', array(), false);
+			$result = $format === 'TEXT'
+				? HTMLToTxt($text, '', array(), false)
+				: TxtToHTML($text);
 
 			return $result;
 		}
