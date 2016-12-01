@@ -252,7 +252,7 @@
 		 * @param  Component $component Компонент Bitrix.
 		 * @return Boolean              True, если кнопка добавлена, иначе false.
 		 */
-		function _bt_action_edit($arItem, $id, $block, $component) {
+		function _bt_area_edit($arItem, $id, $block, $component) {
 			$edit = _bt_get_full($arItem, 'EDIT_LINK');
 				
 			if (empty($edit)) {
@@ -275,7 +275,7 @@
 		 * @param  Component $component Компонент Bitrix.
 		 * @return Boolean              True, если кнопка добавлена, иначе false.
 		 */
-		function _bt_action_delete($arItem, $id, $block, $component) {
+		function _bt_area_delete($arItem, $id, $block, $component) {
 			$delete = _bt_get_full($arItem, 'DELETE_LINK');
 				
 			if (empty($delete)) {
@@ -300,7 +300,7 @@
 		 * @param  String    $flagB     Второй флаг кнопки.
 		 * @return String               Идетификатор области.
 		 */
-		function bt_action($arItem, $component, $flagA = BT_EDIT, $flagB = null) {
+		function bt_area($arItem, $component, $flagA = BT_EDIT, $flagB = null) {
 			$block = _bt_get_full($arItem, 'IBLOCK_ID');
 			$id = _bt_get_full($arItem, 'ID');
 
