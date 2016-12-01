@@ -339,7 +339,7 @@
 		 * @return Mixed        Значение.
 		 */
 		function _bt_fn_value($value) {
-			return empty($value['VALUE']) ? $value : $value['VALUE'];
+			return empty($value['VALUE']) ? null : $value['VALUE'];
 		}
 
 		/**
@@ -625,5 +625,34 @@
 			}
 
 			return $value;
+		}
+	
+	/// ----------------------------------------
+	/// Функции работы со множественными полями.
+	/// ----------------------------------------
+
+		/**
+		 * Возвращает массив ссылок на обработанные изображения из множественного свойства элемента.
+		 * @param  Array  $arItem     Элемент инфоблока.
+		 * @param  String $select     Селектор.
+		 * @param  Number $width      Максимальная ширина изображения.
+		 * @param  Number $height     Максимальная высота изображения.
+		 * @param  String $def        Изображение по умолчанию.
+		 * @return String             Ссылка на изображение.
+		 */
+		function bt_ls_image($arItem, $select, $width = null, $height = null, $def = null) {
+			$list = bt_value($arItem, $select);
+			if (!isset($list)) return null;
+
+			if (is_scalar($list)) $list = array($list);
+			$result = array();
+
+			foreach ($list as $item) {
+				$value = _bt_fn_image($item, $width, $height);
+				$value = empty($value) ? $def : $value;
+				$result[] = $value;
+			}
+
+			return $result;
 		}
 	
