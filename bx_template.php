@@ -308,19 +308,19 @@
 			if ($isExit) return null;
 
 			if ($flagA === BT_EDIT) {
-				$isEdit = _bt_action_edit($arItem, $id, $block, $component);
+				$isEdit = _bt_area_edit($arItem, $id, $block, $component);
 			}
 
 			if ($flagA === BT_DELETE) {
-				$isDelete = _bt_action_delete($arItem, $id, $block, $component);
+				$isDelete = _bt_area_delete($arItem, $id, $block, $component);
 			}
 
 			if ($flagA !== BT_EDIT && $flagB === BT_EDIT) {
-				$isEdit = _bt_action_edit($arItem, $id, $block, $component);
+				$isEdit = _bt_area_edit($arItem, $id, $block, $component);
 			}
 
 			if ($flagA !== BT_DELETE && $flagB === BT_DELETE) {
-				$isDelete = _bt_action_delete($arItem, $id, $block, $component);
+				$isDelete = _bt_area_delete($arItem, $id, $block, $component);
 			}
 
 			$isArea = $isEdit || $isDelete;
