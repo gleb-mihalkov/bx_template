@@ -494,6 +494,16 @@
 			return $result;
 		}
 
+		/**
+		 * Возвращает идентификатор связанного элемента либо раздела.
+		 * @param  Mixed  $value Значение.
+		 * @return String        Идентификатор.
+		 */
+		function _bt_fn_element($value) {
+			if (empty($value)) return null;
+			return is_array($value) ? _bt_get_full($value, 'VALUE') : $value;
+		}
+
 	/// -------------------------------------------
 	/// Методы получения преобразованного значения.
 	/// -------------------------------------------
@@ -590,5 +600,30 @@
 		function bt_html($arItem, $select, $def = null) {
 			$value = bt_func($arItem, $select, '_bt_fn_text', '__KEY__', '__ARRAY__', 'HTML');
 			return empty($value) ? $def : $value;
+		}
+
+		/**
+		 * Возвращает связанный элемент.
+		 * @param  Array          $arItem       Массив.
+		 * @param  String         $select       Селектор.
+		 * @param  Boolean        $isProperties Указывает, следует ли загрузить свойства элемента.
+		 *                                      По умолчанию загружает толко поля.
+		 * @return CIBlockElement               Элемент.
+		 */
+		function bt_element($arItem, $select, $isProperties = false) {
+			$element = bt_func($arItem, $select, '_bt_fn_element');
+			if (empty($element)) return null;
+
+			CModule::IncludeModule("iblock");
+
+			$element = CIBlockElement::GetByID($element)->GetNextElement();
+			if (empty($element)) return null;
+
+			$value = $element->GetFields();
+			if ($isProperties) {
+				$value['PROPERTIES'] = $element->GetProperties();
+			}
+
+			return $value;
 		}
 	
