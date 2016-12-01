@@ -621,7 +621,7 @@
 
 			$value = $element->GetFields();
 			if ($isProperties) {
-				$value['PROPERTIES'] = $element->GetProperties();
+				$value['PROPERTIES'] = $element->GetProperties(array('ID' => 'ASC'));
 			}
 
 			return $value;
